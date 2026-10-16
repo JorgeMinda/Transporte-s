@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informe Técnico de Arquitectura Resiliente - Plataforma SaaS Transporte Escolar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  </script>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-amber: #d97706;
+      --accent-amber-bg: #fffbeb;
+      --accent-rose: #e11d48;
+      --accent-rose-bg: #fff1f2;
+      --code-bg: #0f172a;
+      --code-text: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.65;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 3rem;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.06);
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--surface-border);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-radius: 9999px;
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .btn-print {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-print:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--surface-border);
+      padding-bottom: 0.4rem;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-top: 1.8rem;
+      margin-bottom: 0.6rem;
+      color: #1e293b;
+    }
+
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 1.2rem;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #334155;
+    }
+
+    .meta-card {
+      background: #f1f5f9;
+      border-left: 4px solid var(--primary);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+      color: #334155;
+    }
+
+    .meta-card p {
+      margin: 0.25rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      border: 1px solid var(--surface-border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    tr:nth-child(even) {
+      background: #fcfdfe;
+    }
+
+    .mermaid {
+      background: #f8fafc;
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+
+    pre, code {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 1.25rem;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      font-size: 0.83rem;
+      line-height: 1.5;
+    }
+
+    p code, li code, td code {
+      background: #e2e8f0;
+      color: #0f172a;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 0.4rem;
+    }
+
+    .highlight-card {
+      background: var(--accent-green-bg);
+      border: 1px solid #a7f3d0;
+      padding: 1.25rem;
+      border-radius: 10px;
+      margin: 1.5rem 0;
+    }
+
+    .highlight-card h4 {
+      color: var(--accent-green);
+      margin-top: 0;
+    }
+
+    .wireframe-box {
+      font-family: 'JetBrains Mono', monospace;
+      background: #0f172a;
+      color: #38bdf8;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+      white-space: pre;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      line-height: 1.35;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+      .container {
+        box-shadow: none;
+        border: none;
+        max-width: 100%;
+        padding: 1.5cm;
+      }
+      .btn-print {
+        display: none;
+      }
+      pre {
+        background: #f1f5f9;
+        color: #0f172a;
+        border: 1px solid #cbd5e1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header-bar">
+      <span class="badge">Arquitectura de Software &bull; Informe Oficial</span>
+      <button class="btn-print" onclick="window.print()">
+        🖨️ Imprimir / Guardar en PDF
+      </button>
+    </div>
+
+    <h1>Informe Técnico de Diseño Arquitectónico Resiliente</h1>
+    <p style="font-size: 1.15rem; color: #475569; font-weight: 500;">
+      Plataforma SaaS de Transporte Escolar Multiinstitucional
+    </p>
+
+    <div class="meta-card">
+      <p><strong>Autor:</strong> Principal Software Architect & Senior Technical Lead</p>
+      <p><strong>Fecha:</strong> Octubre 2026</p>
+      <p><strong>Marco Legal & Geográfico:</strong> Ecuador / LOPDP (Ley Orgánica de Protección de Datos Personales)</p>
+      <p><strong>Propósito:</strong> Resolver de forma demostrable las 4 tensiones técnicas operativas (Offline, Ahorro de Megas Prepago, Timbre de Proximidad y Privacidad de Menores) antes de iniciar la construcción del código.</p>
+    </div>
+
+    <h2>1. Resumen Ejecutivo del Diseño</h2>
+    <p>El éxito de una aplicación de transporte escolar en América Latina no se decide en condiciones ideales de laboratorio con conexión de fibra óptica 5G; se decide en las periferias urbanas y valles, donde:</p>
+    <ol>
+      <li>La señal celular de las operadoras (Claro, Movistar, Tuenti) sufre micro-cortes o desvanecimientos repentinos.</li>
+      <li>Los conductores y muchos padres de familia recargan <strong>paquetes prepago de datos móviles</strong> limitados ($1 o $2 por 200 MB &ndash; 500 MB).</li>
+      <li>Los conductores no pueden distraerse operando interfaces complejas mientras conducen.</li>
+      <li>La impuntualidad de los representantes al salir a la parada genera un "efecto dominó" de retrasos en toda la ruta.</li>
+      <li>Los datos de ubicación y domicilios de los niños están amparados por legislaciones estrictas de protección de datos (LOPDP Ecuador, Art. 25).</li>
+    </ol>
+
+    <h2>2. Resolución de la Tensión 1: Modo Offline y Resiliencia de Datos</h2>
+    <p><em>¿Cómo garantizar la continuidad operativa del conductor sin internet y mantener informados a los padres?</em></p>
+
+    <h3>2.1. Arquitectura Local Offline-First del Conductor (IndexedDB + Cola Transaccional)</h3>
+    <p>El dispositivo del conductor no realiza peticiones HTTP directas y bloqueantes para sus operaciones de ruta. En su lugar, implementa el patrón <strong>Local-First with Outbox Pattern</strong>:</p>
+
+    <div class="mermaid">
+    flowchart TD
+        DriverUI["Interfaz del Conductor (1 Toque)"] --> LocalWrite["Escritura Inmediata en Base Local (IndexedDB)"]
+        LocalWrite --> OptimisticUI["Actualización Visual Inmediata (0 ms latencia)"]
+        LocalWrite --> OutboxQueue["Encolado en 'sync_queue' (IndexedDB)"]
+        
+        OutboxQueue --> NetWatcher{"Monitor de Red (NetworkWatcher)"}
+        NetWatcher -- "Conectado (Online)" --> Dispatcher["Sincronizador en Segundo Plano"]
+        NetWatcher -- "Sin Conexión (Offline)" --> Standby["Modo Espera & Badge 'X pendientes'"]
+        
+        Dispatcher --> SupabaseBatch["Envío en Lote a Supabase RPC ('sync_trip_events')"]
+        SupabaseBatch -- "Éxito (200 OK)" --> PurgeLocal["Eliminación de la cola local"]
+        SupabaseBatch -- "Error / Timeout" --> BackoffRetry["Reintento con Retroceso Exponencial"]
+    </div>
+
+    <h4>Estructura de la Base de Datos Local (IndexedDB - Store: <code>transporte_local_db</code>):</h4>
+    <ul>
+      <li><strong><code>trip_manifest</code>:</strong> Padrón precargado del viaje actual (estudiantes, paradas, orden, direcciones de referencia y teléfonos de emergencia). Permite operar 100% desconectado.</li>
+      <li><strong><code>attendance_records</code>:</strong> Estado actual de cada estudiante (<code>pending</code>, <code>boarded</code>, <code>dropped_off</code>, <code>absent</code>).</li>
+      <li><strong><code>sync_queue</code>:</strong> Registro de eventos pendientes de envío al servidor con marcas de tiempo originales (<code>client_timestamp</code>).</li>
+    </ul>
+
+    <h3>2.2. Manejo de Conflictos y Transacciones Idempotentes</h3>
+    <p>Para evitar duplicados si la conexión se corta a mitad de una petición HTTP, el backend expone un procedimiento almacenado PostgreSQL <strong>idempotente</strong>:</p>
+    <ul>
+      <li>Cada evento enviado incluye un <code>client_event_id</code> (UUID).</li>
+      <li>Si el servidor ya procesó ese UUID, responde <code>HTTP 200 { status: 'already_applied' }</code> sin duplicar registros.</li>
+      <li>La hora registrada para la asistencia es siempre <code>client_timestamp</code> (la hora real en que el niño subió al bus), evitando que se registre la hora en que el conductor recuperó la señal 15 minutos más tarde.</li>
+    </ul>
+
+    <h3>2.3. Experiencia de Usuario para los Padres durante la Desconexión</h3>
+    <p>Si el bus pierde cobertura durante el recorrido, el marcador del bus en el mapa entra en modo <strong>"Atenuado / Semitransparente"</strong> con el siguiente indicador:</p>
+    <div class="highlight-card" style="background:#fef3c7; border-color:#fde68a;">
+      <h4 style="color:#b45309;">📡 Estado del Transporte</h4>
+      <p style="margin:0; color:#78350f;">
+        El transporte se encuentra en una zona con baja señal celular. Última parada registrada: Los Pinos (07:14 AM). La ruta continúa su curso normal.
+      </p>
+    </div>
+
+    <h2>3. Resolución de la Tensión 2: Ahorro Extremo de Megas Prepago</h2>
+    <p><em>¿Cómo ofrecer rastreo GPS en vivo sin agotar los paquetes de datos móviles de $1 o $2?</em></p>
+
+    <h3>3.1. Comparativa de Consumo de Datos</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Parámetro</th>
+          <th>Enfoque Tradicional (Ingenuo)</th>
+          <th>Nuestro Enfoque Optimizado (Dead Reckoning + Compact)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Protocolo de envío</strong></td>
+          <td>Peticiones HTTP POST cada 2 segundos</td>
+          <td>Canal WebSocket (Supabase Realtime) con emisión adaptativa</td>
+        </tr>
+        <tr>
+          <td><strong>Cabeceras por envío</strong></td>
+          <td>~800 bytes (TLS, Cookies, Headers HTTP)</td>
+          <td>0 bytes adicionales (Canal TCP/TLS ya abierto)</td>
+        </tr>
+        <tr>
+          <td><strong>Formato del Payload</strong></td>
+          <td>JSON verboso (~250 bytes)</td>
+          <td>Array compacto o micro-JSON (~45 bytes)</td>
+        </tr>
+        <tr>
+          <td><strong>Frecuencia detenido</strong></td>
+          <td>Cada 2 segundos inútilmente</td>
+          <td>1 ping cada 60 segundos (modo reposo)</td>
+        </tr>
+        <tr>
+          <td><strong>Frecuencia en marcha</strong></td>
+          <td>Cada 2 segundos fijo</td>
+          <td>Cada 10-12s en línea recta / Inmediato ante giros (>25°)</td>
+        </tr>
+        <tr>
+          <td><strong>Consumo por hora</strong></td>
+          <td><strong style="color:var(--accent-rose);">~20 MB a 35 MB por recorrido</strong></td>
+          <td><strong style="color:var(--accent-green);">~0.8 MB a 1.5 MB por recorrido</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Consumo mensual (40 viajes)</strong></td>
+          <td><strong style="color:var(--accent-rose);">~1.2 GB a 1.4 GB (Agotaría plan prepago)</strong></td>
+          <td><strong style="color:var(--accent-green);">~45 MB a 60 MB (Dentro de cualquier paquete mínimo)</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>3.2. Algoritmo de Muestreo Adaptativo en el Teléfono del Conductor</h3>
+    <div class="mermaid">
+    flowchart TD
+        GPSFix["Nueva Lectura GPS del Dispositivo"] --> CalcDist["Calcular Distancia (Haversine)"]
+        CalcDist --> CalcAngle["Calcular Cambio de Ángulo (Delta Heading)"]
+        
+        CalcAngle --> CheckMove{"¿Velocidad < 3 km/h? (Detenido)"}
+        CheckMove -- Sí --> StopTimer{"¿Han pasado > 60s?"}
+        StopTimer -- No --> Discard["Omitir Transmisión (Ahorro de Megas)"]
+        StopTimer -- Sí --> Transmit["Transmitir Micro-Ping de Reposo"]
+        
+        CheckMove -- No --> CheckTurn{"¿Giro > 25 grados?"}
+        CheckTurn -- Sí --> TransmitTurn["Transmitir Inmediato (Trazar Curva)"]
+        CheckTurn -- No --> CheckDist{"¿Distancia > 80m O Tiempo > 12s?"}
+        CheckDist -- Sí --> TransmitMove["Transmitir Posición en Marcha"]
+        CheckDist -- No --> Discard
+    </div>
+
+    <h3>3.3. Estructura del Micro-Payload (Reducción de un 80% en tamaño)</h3>
+    <p>En lugar de enviar un JSON con claves repetitivas de 248 bytes, transmitimos un array compacto de 52 bytes:</p>
+    <pre>[-0.180653, -78.467834, 34.5, 182, 1729020300]
+// [lat, lng, velocidad_kmh, rumbo_grados, timestamp_unix_segundos]</pre>
+
+    <h2>4. Resolución de la Tensión 3: Alerta Sonora y UX Anti-Impuntualidad</h2>
+    <p><em>¿Cómo lograr que el padre salga a tiempo sin retrasar la ruta del bus?</em></p>
+
+    <h3>4.1. Arquitectura de Dos Canales para el Timbre</h3>
+    <div class="mermaid">
+    sequenceDiagram
+        autonumber
+        participant Bus as Conductor (GPS en marcha)
+        participant Edge as Servidor / Geocerca PostGIS
+        participant ParentPhone as Teléfono del Representante
+        
+        Bus->>Edge: Emisión de posición (bus ingresa al radio de 600m)
+        Edge->>Edge: Detección de proximidad a Parada X
+        
+        alt Padre tiene la Aplicación Abierta en Pantalla
+            Edge->>ParentPhone: Mensaje WebSocket 'PROXIMITY_ALERT'
+            Note over ParentPhone: Web Audio API ejecuta sintetizador local (0 bytes descargados)
+            ParentPhone->>ParentPhone: Reproducción de Timbre Sonoro + Vibración
+            ParentPhone->>ParentPhone: Muestra Cuenta Regresiva ("Llega en ~3 min")
+        else Teléfono del Padre Bloqueado / En Bolsillo
+            Edge->>ParentPhone: Web Push Notification (High Priority / Urgente)
+            Note over ParentPhone: Service Worker despierta el teléfono
+            ParentPhone->>ParentPhone: Tono de Alerta Nativo del Sistema + Vibración Continua
+        end
+        
+        ParentPhone->>Bus: Padre presiona botón "¡Ya estoy en la parada!"
+        Note over Bus: Pantalla del Conductor: Tarjeta del alumno se pinta de VERDE brillante
+    </div>
+
+    <h3>4.2. Generación del Timbre Sonoro con Cero Descargas (Web Audio API)</h3>
+    <p>Para no consumir datos móviles descargando audios MP3 en cada parada, el timbre se genera matemáticamente en el navegador con la Web Audio API:</p>
+    <pre><code class="language-typescript">export function playSchoolChime(): void {
+  try {
+    const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const now = audioCtx.currentTime;
+    
+    // Tono 1: Campana alta (880 Hz - Nota La5)
+    const osc1 = audioCtx.createOscillator();
+    const gain1 = audioCtx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(880, now);
+    gain1.gain.setValueAtTime(0.3, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+    osc1.connect(gain1);
+    gain1.connect(audioCtx.destination);
+    
+    // Tono 2: Resonancia cálida (587.33 Hz - Nota Re5 con delay de 150ms)
+    const osc2 = audioCtx.createOscillator();
+    const gain2 = audioCtx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(587.33, now + 0.15);
+    gain2.gain.setValueAtTime(0.4, now + 0.15);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+    osc2.connect(gain2);
+    gain2.connect(audioCtx.destination);
+
+    osc1.start(now);
+    osc1.stop(now + 0.8);
+    osc2.start(now + 0.15);
+    osc2.stop(now + 1.2);
+  } catch (e) {
+    console.warn('Audio no permitido o no soportado', e);
+  }
+}</code></pre>
+
+    <h3>4.3. Protocolo UX Anti-Impuntualidad en 3 Fases</h3>
+    <ul>
+      <li><strong>Fase 1 (Pre-aviso a ~1.2 km / 6 min):</strong> Notificación silenciosa indicando proximidad al sector.</li>
+      <li><strong>Fase 2 (Alerta Activa y Timbre a ~500 m / 3 min):</strong> Timbre sonoro + cuenta regresiva dinámica en pantalla amarilla con botón gigante: <code>[ 🟢 ¡YA ESTAMOS EN LA PARADA! ]</code>.</li>
+      <li><strong>Fase 3 (Confirmación en el Bus):</strong> Al presionar el botón, la tarjeta del alumno en la pantalla del conductor destella en verde. Si no lo hace y el bus llega, corre un temporizador de cortesía de 60s antes de habilitar el botón de 1 toque: <em>"Reportar Ausencia"</em>.</li>
+    </ul>
+
+    <h2>5. Resolución de la Tensión 4: Domicilios y Privacidad de Menores (LOPDP)</h2>
+    <p><em>¿Cómo ubicar exactamente la parada de cada alumno sin exponer la intimidad de los menores a terceros?</em></p>
+
+    <h3>5.1. Abstracción: Domicilio Privado vs. Parada Operativa</h3>
+    <div class="mermaid">
+    erDiagram
+        STUDENT {
+            uuid id PK
+            string full_name
+            string private_home_address "Cifrado / Solo Admin y Padre"
+            geometry private_home_location "PostGIS Point / Privado"
+        }
+        
+        ROUTE_STOP {
+            uuid id PK
+            uuid route_id FK
+            integer stop_order
+            string stop_public_name "Ej. Parada 4: Esquina Los Pinos y Nogales"
+            geometry stop_location "PostGIS Point"
+        }
+        
+        STUDENT_STOP_ASSIGNMENT {
+            uuid student_id FK
+            uuid stop_id FK
+        }
+        
+        STUDENT ||--o{ STUDENT_STOP_ASSIGNMENT : boards_at
+        ROUTE_STOP ||--o{ STUDENT_STOP_ASSIGNMENT : groups
+    </div>
+
+    <h3>5.2. Reglas de Visibilidad en el Mapa por Rol</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Actor</th>
+          <th>Lo que VE en el mapa</th>
+          <th>Lo que TIENE BLOQUEADO por RLS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Admin Colegio</strong></td>
+          <td>Todos los domicilios, paradas, rutas y unidades.</td>
+          <td>Nada (sujeto a logs de auditoría por consulta).</td>
+        </tr>
+        <tr>
+          <td><strong>Conductor Asignado</strong></td>
+          <td>Las paradas secuenciales de su ruta y referencias visuales ("Portón blanco").</td>
+          <td>Direcciones de alumnos de otras rutas o colegios.</td>
+        </tr>
+        <tr>
+          <td><strong>Representante Legal</strong></td>
+          <td><strong>Únicamente la parada de su propio hijo y el bus en movimiento.</strong></td>
+          <td><strong>TOTALMENTE BLOQUEADO:</strong> No ve paradas de otros niños, no ve casas de otros niños ni nombres de otros pasajeros.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>6. Diseño de Interfaz de Usuario para el Conductor (HU-03)</h2>
+    <p>Diseño táctil de 1 toque, operable con una mano sobre soporte de parabrisas:</p>
+    <div class="wireframe-box">┌────────────────────────────────────────────────────────┐
+│ 🚸 RUTA 04 - MAÑANA          [🟢 EN LÍNEA | 3 en cola] │
+│ 📍 PRÓXIMA PARADA: Av. Ilaló y Calle 3      07:18 AM   │
+├────────────────────────────────────────────────────────┤
+│ ESTUDIANTES EN ESTA PARADA (2):                        │
+│                                                        │
+│ ┌────────────────────────────────────────────────────┐ │
+│ │ 👦 Mateo Carrillo (5to EGB)   [🟢 PADRE EN PARADA] │ │
+│ │   Ref: Casa esquinera portón negro                 │ │
+│ │                                                    │ │
+│ │  [ 🟢 A BORDO ]     [ 🟡 AUSENTE ]   [ 📞 LLAMAR ] │ │
+│ └────────────────────────────────────────────────────┘ │
+│                                                        │
+│ ┌────────────────────────────────────────────────────┐ │
+│ │ 👧 Valentina Morales (3ro EGB)                     │ │
+│ │   Ref: Junto a Farmacia SanaSana                   │ │
+│ │                                                    │ │
+│ │  [ 🟢 A BORDO ]     [ 🟡 AUSENTE ]   [ 📞 LLAMAR ] │ │
+│ └────────────────────────────────────────────────────┘ │
+├────────────────────────────────────────────────────────┤
+│ RESUMEN: 12 A bordo | 3 Pendientes | 1 Ausente        │
+│ [ ⚠️ REPORTAR INCIDENCIA (TRÁFICO/DESVÍO) ]            │
+└────────────────────────────────────────────────────────┘</div>
+
+    <h2>7. Conclusión</h2>
+    <div class="highlight-card">
+      <h4>Garantías del Diseño</h4>
+      <p style="margin:0;">
+        Este informe técnico demuestra que la plataforma está arquitectónicamente preparada para operar sin interrupciones ante fallas de cobertura celular, con un consumo que no agotará los saldos prepago de los usuarios, resolviendo la impuntualidad en las paradas con timbres sonoros sin descargas y garantizando el cumplimiento pleno de la normativa de protección de datos de menores.
+      </p>
+    </div>
+  </div>
+
+</body>
+</html>
